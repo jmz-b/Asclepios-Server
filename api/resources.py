@@ -47,6 +47,9 @@ class MapResource(ModelResource):
         queryset = Map.objects.all()
         resource_name = 'map'
         authorization = Authorization()
+        filtering = {
+            "address": ['exact'],
+        }
 
     
 #===============================================================================
@@ -147,15 +150,9 @@ class SearchResource(Resource):
             logger.debug("Lu = Lta")
              # Identify list of json identifiers
             Cfw = []
-#             for e in Map.objects.all():
-#                 try:
-#                     print("address:",e.address)
-#                     print("type of address:",type(e.address))
-#                 except:
-#                     print("error in getting objects")
-#             print("start matching:")
+
             logger.debug("fileno:",fileno)  
-            for i in range(1, int(fileno) + 1):
+            for i in range(1, int(fileno) + 1): # fileno starts at 1
                 logger.debug("i:", i)
                 KeyW_ciphertext = json.loads(KeyW)['ct'] # get value of json
                 input =  (KeyW_ciphertext + str(i) + "0").encode('utf-8')
@@ -163,8 +160,7 @@ class SearchResource(Resource):
                 logger.debug("hash input:", input)
                 logger.debug("hash output (computed from KeyW):", addr)
                 logger.debug("type of addr:",type(addr))
-                #addr_b = addr.encode('utf-8') # convert string to byte
-                 # cf = Map.objects.first().location # get the value of the entry with address = addr
+
                 try:
                     logger.debug("finding address")
                     
@@ -193,21 +189,3 @@ class SearchResource(Resource):
         
  
         return bundle
-        
-#     
-#     def obj_update(self, bundle, request = None, **kwargs):
-#         # update an existing row
-# #         pk = int(kwargs['pk'])
-# #         try:
-# #             bundle.obj = data[pk]
-# #         except KeyError:
-# #             raise NotFound("Object not found")
-#          
-# #         # let full_hydrate do its work
-# #         bundle = self.full_hydrate(bundle)
-#          
-#         # update existing row in data dict
-# #         data[pk] = bundle.obj
-#         Lta = kwargs['Lta']
-#         print("Lta:",Lta)
-#         return bundle
