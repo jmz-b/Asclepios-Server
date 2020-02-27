@@ -10,6 +10,6 @@ class CipherText(models.Model):
 
 class Map(models.Model):
 	address = models.CharField(max_length=300)
-	location = models.CharField(max_length=300) # value
+	value = models.CharField(max_length=300) # file identifiers
 	def __str__(self):
-		return '%s %s' % (self.address, self.location) 	
+		return '%s %s' % (self.address, self.value) 	

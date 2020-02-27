@@ -148,8 +148,11 @@ class SearchResource(Resource):
         
         if Lu == Lta:
             logger.debug("Lu = Lta")
-             # Identify list of json identifiers
+            # Identify list of json identifiers
             Cfw = []
+            
+            # List of encrypted data
+            CipherL = []
 
             logger.debug("fileno:",fileno)  
             for i in range(1, int(fileno) + 1): # fileno starts at 1
@@ -157,33 +160,42 @@ class SearchResource(Resource):
                 KeyW_ciphertext = json.loads(KeyW)['ct'] # get value of json
                 input =  (KeyW_ciphertext + str(i) + "0").encode('utf-8')
                 addr = hash(input)
-                logger.debug("hash input:", input)
-                logger.debug("hash output (computed from KeyW):", addr)
+                logger.debug("hash input to compute address:", input)
+                logger.debug("the hash output (computed from KeyW):", addr)
                 logger.debug("type of addr:",type(addr))
 
                 try:
                     logger.debug("finding address")
                     
                     # Retrieve value which corresponds to the address 'addr'
-                    cf = Map.objects.get(address=addr).location
-                    logger.debug("Encrypted json_id:",cf)
+                    cf = Map.objects.get(address=addr).value
+                    logger.debug("File identifier:",cf)
                     
                     # Create list of values, which will be used to identify json-id
                     Cfw.append(cf)
                     
+                    # Retrieve ciphertexts
+                    ct = CipherText.objects.filter(jsonId=cf).values()
+                    logger.debug("Ciphertext of the same file:",ct)
+                    CipherL.append(list(ct))
+                    
                     # Delete the current (address, value) and update with the new (address, value)
                     Map.objects.get(address=addr).delete()
                     logger.debug("New address:",Lu[i-1])
-                    Map.objects.create(address=Lu[i-1],location=cf) # fileno == length(Lu)
+                    Map.objects.create(address=Lu[i-1],value=cf) # fileno == length(Lu)
                 except:
                     logger.debug("Not found:",addr)
                     cf = None
                         
-            bundle.obj.Cfw = Cfw
+#             bundle.obj.Cfw = Cfw
+            bundle.obj.Cfw = CipherL
+            logger.debug("The list of ciphertext:",CipherL)
+           # bundle.obj.Cfw = CipherL
             bundle.obj.KeyW = '' # hide KeyW in the response
             bundle.obj.fileno = 0 # hide fileNo in the response  
             bundle.obj.Lu=[]     # hide Lu in the response  
-            logger.debug("Send list of addresses (Cfw) back to the user:", bundle)
+#             logger.debug("Send list of addresses (Cfw) back to the user:", bundle)
+            logger.debug("Send list of ciphertext (Cfw) back to the user:", bundle)
         else:
             logger.debug("Lu!=Lta")
         
