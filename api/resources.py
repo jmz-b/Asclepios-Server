@@ -149,7 +149,7 @@ class SearchResource(Resource):
         if Lu == Lta:
             logger.debug("Lu = Lta")
             # Identify list of json identifiers
-            Cfw = []
+            #Cfw = []
             
             # List of encrypted data
             CipherL = []
@@ -172,7 +172,7 @@ class SearchResource(Resource):
                     logger.debug("File identifier:",cf)
                     
                     # Create list of values, which will be used to identify json-id
-                    Cfw.append(cf)
+                    #Cfw.append(cf)
                     
                     # Retrieve ciphertexts
                     ct = CipherText.objects.filter(jsonId=cf).values()
