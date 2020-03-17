@@ -9,7 +9,7 @@
 # Apply database migrations
 echo "Apply database migrations"
 python3 manage.py makemigrations
-python3 manage.py migrate
+python3 manage.py migrate --run-syncdb
 
 exec gunicorn SSEServer.wsgi:application \
     --name sse \
