@@ -81,6 +81,7 @@ WSGI_APPLICATION = 'SSEServer.wsgi.application'
 
 DATABASES = {
     'default': {
+<<<<<<< HEAD
         'ENGINE': 'django.db.backends.sqlite3', # for local test
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'), # for local test
         #'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -89,6 +90,16 @@ DATABASES = {
         #'PASSWORD': os.environ['DB_PASSWORD'], # user password
         #'HOST': os.environ['DB_HOST'], # postgres server
         #'PORT': os.environ['DB_PORT'],  # postgres port
+=======
+        #'ENGINE': 'django.db.backends.sqlite3', # for local test
+        #'NAME': os.path.join(BASE_DIR, 'db.sqlite3'), # for local test
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ['DB_NAME'],#'ssedb', # database name
+        'USER': os.environ['DB_USER'], # user name
+        'PASSWORD': os.environ['DB_PASSWORD'], # user password
+        'HOST': os.environ['DB_HOST'], # postgres server
+        'PORT': os.environ['DB_PORT'],  # postgres port
+>>>>>>> f96315b4173c5b4889430ed8a4801124f831b309
     }
 }
 
