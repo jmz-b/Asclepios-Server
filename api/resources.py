@@ -110,7 +110,7 @@ class SearchResource(Resource):
     
     def obj_create(self, bundle, request=None, **kwargs):
         logger.info("Search in SSE Server")
-        logger.debug("TA url:",URL_TA)
+        logger.debug("TA url: %s",URL_TA)
         
         # create a new object
         bundle.obj = Search()
@@ -119,32 +119,32 @@ class SearchResource(Resource):
         # POST-ed payload key/values to object attribute/values
         bundle = self.full_hydrate(bundle)
          
-        logger.debug("Received data from user:", " - KeyW: ",bundle.obj.KeyW, " - file number: ", bundle.obj.fileno, " - Lu:", bundle.obj.Lu)
+        logger.debug("Received data from user %s:", " - KeyW: ",bundle.obj.KeyW, " - file number: ", bundle.obj.fileno, " - Lu:", bundle.obj.Lu)
         
         # invoke API of TA
         fileno = bundle.obj.fileno
         KeyW = json.dumps(bundle.obj.KeyW)
         
-        logger.debug("KeyW:", KeyW)
+        logger.debug("KeyW: %s", KeyW)
         
         data = {}
         data["KeyW"] = bundle.obj.KeyW
         data["fileno"] = bundle.obj.fileno
         
-        logger.debug("json data:", data)
-        logger.debug("URL_TA:",URL_TA)
+        logger.debug("json data: %s", data)
+        logger.debug("URL_TA: %s",URL_TA)
         
         # Send request to TA
         logger.debug("Send request to TA")
         response = requests.post(URL_TA, json=data)  
         
-        logger.debug("Response from TA: Lta = ", response.text)
+        logger.debug("Response from TA: Lta = %s", response.text)
         
         # compare the list received from TA with the list received from the user
         Lu = bundle.obj.Lu
-        logger.debug("List from user:", Lu)
+        logger.debug("List from user: %s", Lu)
         Lta = response.json()["Lta"]
-        logger.debug("List from TA:", Lta)
+        logger.debug("List from TA: %s", Lta)
         
         if Lu == Lta:
             logger.debug("Lu = Lta")
@@ -154,48 +154,48 @@ class SearchResource(Resource):
             # List of encrypted data
             CipherL = []
 
-            logger.debug("fileno:",fileno)  
+            logger.debug("fileno: %s",fileno)  
             for i in range(1, int(fileno) + 1): # fileno starts at 1
-                logger.debug("i:", i)
+                logger.debug("i: %s", i)
                 KeyW_ciphertext = json.loads(KeyW)['ct'] # get value of json
                 input =  (KeyW_ciphertext + str(i) + "0").encode('utf-8')
                 addr = hash(input)
-                logger.debug("hash input to compute address:", input)
-                logger.debug("the hash output (computed from KeyW):", addr)
-                logger.debug("type of addr:",type(addr))
+                logger.debug("hash input to compute address: %s", input)
+                logger.debug("the hash output (computed from KeyW): %s", addr)
+                logger.debug("type of addr: %s",type(addr))
 
                 try:
                     logger.debug("finding address")
                     
                     # Retrieve value which corresponds to the address 'addr'
                     cf = Map.objects.get(address=addr).value
-                    logger.debug("File identifier:",cf)
+                    logger.debug("File identifier: %s",cf)
                     
                     # Create list of values, which will be used to identify json-id
                     #Cfw.append(cf)
                     
                     # Retrieve ciphertexts
                     ct = CipherText.objects.filter(jsonId=cf).values()
-                    logger.debug("Ciphertext of the same file:",ct)
+                    logger.debug("Ciphertext of the same file: %s",ct)
                     CipherL.append(list(ct))
                     
                     # Delete the current (address, value) and update with the new (address, value)
                     Map.objects.get(address=addr).delete()
-                    logger.debug("New address:",Lu[i-1])
+                    logger.debug("New address: %s",Lu[i-1])
                     Map.objects.create(address=Lu[i-1],value=cf) # fileno == length(Lu)
                 except:
-                    logger.debug("Not found:",addr)
+                    logger.debug("Not found: %s",addr)
                     cf = None
                         
 #             bundle.obj.Cfw = Cfw
             bundle.obj.Cfw = CipherL
-            logger.debug("The list of ciphertext:",CipherL)
+            logger.debug("The list of ciphertext: %s",CipherL)
            # bundle.obj.Cfw = CipherL
             bundle.obj.KeyW = '' # hide KeyW in the response
             bundle.obj.fileno = 0 # hide fileNo in the response  
             bundle.obj.Lu=[]     # hide Lu in the response  
 #             logger.debug("Send list of addresses (Cfw) back to the user:", bundle)
-            logger.debug("Send list of ciphertext (Cfw) back to the user:", bundle)
+            logger.debug("Send list of ciphertext (Cfw) back to the user: %s", bundle)
         else:
             logger.debug("Lu!=Lta")
         
